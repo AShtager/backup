@@ -4,7 +4,9 @@ import tqdm
 
 
 class VKUser:
-
+    """
+    запрашиваем id и token пользователя вк 
+    """
     url_base_vk = "https://api.vk.com/method/"
 
     def __init__(self):
@@ -12,6 +14,9 @@ class VKUser:
         self.vk_token = input("Введите Ваш токен вк: ")
 
     def _user_photos_get(self):
+        """
+        API метод вк, функция вернет json файл с информацией по фотографиям
+        """
         name_method = "photos.get"
         url_method_api = self.url_base_vk + name_method
         params = {
@@ -26,6 +31,10 @@ class VKUser:
         return response.json()
 
     def _user_photo_info(self):
+        """
+        сохраням информацию фотографий пользователя в словаря ключ количество лайков, 
+        значение словарь со значениями: размер и url
+        """
         all_data_photos = self._user_photos_get()
         info_photos = {}
 
@@ -48,10 +57,18 @@ class VKUser:
 
 
 class YanDiscUser(VKUser):
-
+    """
+    взаимодействует с родительским классом, загружаем фотографии пользователя на яндекс диск.
+    пример использования:
+    user_1 = YanDiscUser()
+    user_1.loanding_photo()
+    """
     url_base = "https://cloud-api.yandex.net"
 
     def _user_name_photos(self):
+        """
+        сохраняем информацию по загруженным фотографиям в json файл
+        """
         all_data_photos = self._user_photo_info()
         name_photos = []
 
@@ -63,6 +80,9 @@ class YanDiscUser(VKUser):
             json.dump(name_photos, file)
 
     def loanding_photo(self):
+        """
+        загружаем фотографии пользователя на его яндекс диск
+        """
         self._user_name_photos()
         info_photo = self._user_photo_info()
         self.name_folder = input("Введите название папки: ")
@@ -70,7 +90,7 @@ class YanDiscUser(VKUser):
         url_create_folder = f"{self.url_base}/v1/disk/resources"
         url_loading = f"{self.url_base}/v1/disk/resources/upload"
         params = {"path": self.name_folder}
-        headers = {"Authorization": f"OAuth {input("Введите ваш токен Яндекс диска: ")}"}
+        headers = {"Authorization": f"OAuth {input('Введите Ваш токен Яндекс диска: ')}"}
         requests.put(url_create_folder, params=params, headers=headers)
         
         for name, info in tqdm.tqdm(info_photo.items()):
@@ -79,8 +99,8 @@ class YanDiscUser(VKUser):
                 "url": info["url"]
             }
             requests.post(url_loading, params=params_loand, headers=headers)
-        return f"Фотографии загружены"
+        return 
             
 
 user_1 = YanDiscUser()
-print(user_1.loanding_photo())
+user_1.loanding_photo()
