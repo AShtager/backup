@@ -55,7 +55,7 @@ class VKUser:
                         "url": f"{sorted_size_all[-1]['url']}"}
                     }
                 info_photos.update(dict_info)
-            return info_photos
+        return info_photos
 
 
 class YanDiscUser(VKUser):
