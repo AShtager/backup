@@ -1,6 +1,7 @@
 import json
 import requests
 import tqdm
+from operator import itemgetter
 
 
 class VKUser:
@@ -39,21 +40,22 @@ class VKUser:
         info_photos = {}
 
         for photos_particulars in all_data_photos["response"]["items"]:
+            sorted_size_all = sorted(photos_particulars["sizes"], key=itemgetter("height"))
             if photos_particulars["likes"]["count"] not in info_photos:
                 dict_info = {
                     photos_particulars["likes"]["count"]: {
-                        "size": f"{photos_particulars['sizes'][-1]['type']}",
-                        "url": f"{photos_particulars['sizes'][-1]['url']}"}
+                        "size": f"{sorted_size_all[-1]['type']}",
+                        "url": f"{sorted_size_all[-1]['url']}"}
                 }
                 info_photos.update(dict_info)
             else:
                 dict_info = {
                     str(photos_particulars["likes"]["count"]) + str(photos_particulars["date"]): {
-                        "size": f"{photos_particulars['sizes'][-1]['type']}",
-                        "url": f"{photos_particulars['sizes'][-1]['url']}"}
-                }
+                        "size": f"{sorted_size_all[-1]['type']}",
+                        "url": f"{sorted_size_all[-1]['url']}"}
+                    }
                 info_photos.update(dict_info)
-        return info_photos
+            return info_photos
 
 
 class YanDiscUser(VKUser):
